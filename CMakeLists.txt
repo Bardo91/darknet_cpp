@@ -27,20 +27,17 @@ if (CUDA_FOUND)
     -gencode arch=compute_62,code=sm_62
   )
   add_definitions(-DGPU)
-else()
-  list(APPEND LIBRARIES "m")
-endif()
 
+  
+	# Find rquired packeges
+	find_package(Boost REQUIRED COMPONENTS thread)
+	find_package(OpenCV REQUIRED)
 
-# Find rquired packeges
-find_package(Boost REQUIRED COMPONENTS thread)
-find_package(OpenCV REQUIRED)
+	# Enable OPENCV in darknet
+	add_definitions(-DOPENCV)
+	add_definitions(-O4 -g)
 
-# Enable OPENCV in darknet
-add_definitions(-DOPENCV)
-add_definitions(-O4 -g)
-
-if (CUDA_FOUND)
+  
   include_directories(
     ${DARKNET_PATH}/src
     ${DARKNET_PATH}/include
@@ -113,6 +110,9 @@ if (CUDA_FOUND)
 
   target_include_directories(${PROJECT_NAME} PUBLIC darknet)
   target_link_libraries(${PROJECT_NAME} darknet_c)
+  
+  set_property(TARGET darknet_cpp PROPERTY FOLDER "dep")
+  
 else()
     MESSAGE(ERROR "CUDA NOT FOUND CANT COMPILE DARKNET")
 endif()
