@@ -334,7 +334,7 @@ void exclusive_image(image src)
     }
 }
 
-box bound_image(image im)
+darknet_box bound_image(image im)
 {
     int x,y;
     int minx = im.w;
@@ -351,7 +351,7 @@ box bound_image(image im)
             }
         }
     }
-    box b = {minx, miny, maxx-minx + 1, maxy-miny + 1};
+    darknet_box b = {minx, miny, maxx-minx + 1, maxy-miny + 1};
     //printf("%f %f %f %f\n", b.x, b.y, b.w, b.h);
     return b;
 }
@@ -376,7 +376,7 @@ void fill_truth_iseg(char *path, int num_boxes, float *truth, int classes, int w
         load_rle(part, rle, n);
         image sized = rotate_crop_image(part, aug.rad, aug.scale, aug.w, aug.h, aug.dx, aug.dy, aug.aspect);
         if(flip) flip_image(sized);
-        box b = bound_image(sized);
+        darknet_box b = bound_image(sized);
         if(b.w > 0){
             image crop = crop_image(sized, b.x, b.y, b.w, b.h);
             image mask = resize_image(crop, mw, mh);

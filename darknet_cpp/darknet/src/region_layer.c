@@ -73,9 +73,9 @@ void resize_region_layer(layer *l, int w, int h)
 #endif
 }
 
-box get_region_box(float *x, float *biases, int n, int index, int i, int j, int w, int h, int stride)
+darknet_box get_region_box(float *x, float *biases, int n, int index, int i, int j, int w, int h, int stride)
 {
-    box b;
+    darknet_box b;
     b.x = (i + x[index + 0*stride]) / w;
     b.y = (j + x[index + 1*stride]) / h;
     b.w = exp(x[index + 2*stride]) * biases[2*n]   / w;
@@ -83,9 +83,9 @@ box get_region_box(float *x, float *biases, int n, int index, int i, int j, int 
     return b;
 }
 
-float delta_region_box(box truth, float *x, float *biases, int n, int index, int i, int j, int w, int h, float *delta, float scale, int stride)
+float delta_region_box(darknet_box truth, float *x, float *biases, int n, int index, int i, int j, int w, int h, float *delta, float scale, int stride)
 {
-    box pred = get_region_box(x, biases, n, index, i, j, w, h, stride);
+    darknet_box pred = get_region_box(x, biases, n, index, i, j, w, h, stride);
     float iou = box_iou(pred, truth);
 
     float tx = (truth.x*w - i);
@@ -193,7 +193,7 @@ void forward_region_layer(const layer l, network net)
         if(l.softmax_tree){
             int onlyclass = 0;
             for(t = 0; t < 30; ++t){
-                box truth = float_to_box(net.truth + t*(l.coords + 1) + b*l.truths, 1);
+                darknet_box truth = float_to_box(net.truth + t*(l.coords + 1) + b*l.truths, 1);
                 if(!truth.x) break;
                 int class = net.truth[t*(l.coords + 1) + b*l.truths + l.coords];
                 float maxp = 0;
@@ -227,10 +227,10 @@ void forward_region_layer(const layer l, network net)
             for (i = 0; i < l.w; ++i) {
                 for (n = 0; n < l.n; ++n) {
                     int box_index = entry_index(l, b, n*l.w*l.h + j*l.w + i, 0);
-                    box pred = get_region_box(l.output, l.biases, n, box_index, i, j, l.w, l.h, l.w*l.h);
+                    darknet_box pred = get_region_box(l.output, l.biases, n, box_index, i, j, l.w, l.h, l.w*l.h);
                     float best_iou = 0;
                     for(t = 0; t < 30; ++t){
-                        box truth = float_to_box(net.truth + t*(l.coords + 1) + b*l.truths, 1);
+                        darknet_box truth = float_to_box(net.truth + t*(l.coords + 1) + b*l.truths, 1);
                         if(!truth.x) break;
                         float iou = box_iou(pred, truth);
                         if (iou > best_iou) {
@@ -246,7 +246,7 @@ void forward_region_layer(const layer l, network net)
                     }
 
                     if(*(net.seen) < 12800){
-                        box truth = {0};
+                        darknet_box truth = {0};
                         truth.x = (i + .5)/l.w;
                         truth.y = (j + .5)/l.h;
                         truth.w = l.biases[2*n]/l.w;
@@ -257,7 +257,7 @@ void forward_region_layer(const layer l, network net)
             }
         }
         for(t = 0; t < 30; ++t){
-            box truth = float_to_box(net.truth + t*(l.coords + 1) + b*l.truths, 1);
+            darknet_box truth = float_to_box(net.truth + t*(l.coords + 1) + b*l.truths, 1);
 
             if(!truth.x) break;
             float best_iou = 0;
@@ -265,13 +265,13 @@ void forward_region_layer(const layer l, network net)
             i = (truth.x * l.w);
             j = (truth.y * l.h);
             //printf("%d %f %d %f\n", i, truth.x*l.w, j, truth.y*l.h);
-            box truth_shift = truth;
+            darknet_box truth_shift = truth;
             truth_shift.x = 0;
             truth_shift.y = 0;
             //printf("index %d %d\n",i, j);
             for(n = 0; n < l.n; ++n){
                 int box_index = entry_index(l, b, n*l.w*l.h + j*l.w + i, 0);
-                box pred = get_region_box(l.output, l.biases, n, box_index, i, j, l.w, l.h, l.w*l.h);
+                darknet_box pred = get_region_box(l.output, l.biases, n, box_index, i, j, l.w, l.h, l.w*l.h);
                 if(l.bias_match){
                     pred.w = l.biases[2*n]/l.w;
                     pred.h = l.biases[2*n+1]/l.h;
@@ -333,7 +333,7 @@ void backward_region_layer(const layer l, network net)
      */
 }
 
-void correct_region_boxes(box *boxes, int n, int w, int h, int netw, int neth, int relative)
+void correct_region_boxes(darknet_box *boxes, int n, int w, int h, int netw, int neth, int relative)
 {
     int i;
     int new_w=0;
@@ -346,7 +346,7 @@ void correct_region_boxes(box *boxes, int n, int w, int h, int netw, int neth, i
         new_w = (w * neth)/h;
     }
     for (i = 0; i < n; ++i){
-        box b = boxes[i];
+        darknet_box b = boxes[i];
         b.x =  (b.x - (netw - new_w)/2./netw) / ((float)new_w/netw); 
         b.y =  (b.y - (neth - new_h)/2./neth) / ((float)new_h/neth); 
         b.w *= (float)netw/new_w;
@@ -361,7 +361,7 @@ void correct_region_boxes(box *boxes, int n, int w, int h, int netw, int neth, i
     }
 }
 
-void get_region_boxes(layer l, int w, int h, int netw, int neth, float thresh, float **probs, box *boxes, float **masks, int only_objectness, int *map, float tree_thresh, int relative)
+void get_region_boxes(layer l, int w, int h, int netw, int neth, float thresh, float **probs, darknet_box *boxes, float **masks, int only_objectness, int *map, float tree_thresh, int relative)
 {
     int i,j,n,z;
     float *predictions = l.output;

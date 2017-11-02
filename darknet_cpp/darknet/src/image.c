@@ -161,7 +161,7 @@ void draw_box_width(image a, int x1, int y1, int x2, int y2, int w, float r, flo
     }
 }
 
-void draw_bbox(image a, box bbox, int w, float r, float g, float b)
+void draw_bbox(image a, darknet_box bbox, int w, float r, float g, float b)
 {
     int left  = (bbox.x-bbox.w/2)*a.w;
     int right = (bbox.x+bbox.w/2)*a.w;
@@ -190,7 +190,7 @@ image **load_alphabet()
     return alphabets;
 }
 
-void draw_detections(image im, int num, float thresh, box *boxes, float **probs, float **masks, char **names, image **alphabet, int classes)
+void draw_detections(image im, int num, float thresh, darknet_box *boxes, float **probs, float **masks, char **names, image **alphabet, int classes)
 {
     int i;
 
@@ -218,7 +218,7 @@ void draw_detections(image im, int num, float thresh, box *boxes, float **probs,
             rgb[0] = red;
             rgb[1] = green;
             rgb[2] = blue;
-            box b = boxes[i];
+            darknet_box b = boxes[i];
 
             int left  = (b.x-b.w/2.)*im.w;
             int right = (b.x+b.w/2.)*im.w;

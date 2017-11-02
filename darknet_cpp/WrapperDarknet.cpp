@@ -31,7 +31,7 @@ WrapperDarknet::WrapperDarknet(std::string mModelFile, std::string mWeightsFile)
 
     layer l = mNet.layers[mNet.n-1];
 
-    mBoxes = (box*) calloc(l.w*l.h*l.n, sizeof(box));
+    mBoxes = (darknet_box*) calloc(l.w*l.h*l.n, sizeof(darknet_box));
     mProbs = (float**)calloc(l.w*l.h*l.n, sizeof(float *));
     for(int j = 0; j < l.w*l.h*l.n; ++j) mProbs[j] = (float *) calloc(l.classes + 1, sizeof(float *));
     mMasks = 0;
@@ -93,7 +93,7 @@ std::vector<std::vector<float> > WrapperDarknet::detect(const cv::Mat &img) {
             imgRes.push_back(classi);
             imgRes.push_back(prob);
 
-            box b = mBoxes[i];
+            darknet_box b = mBoxes[i];
             float left  = (b.x-b.w/2.);
             float top   = (b.y-b.h/2.);
             float right = (b.x+b.w/2.);

@@ -97,7 +97,7 @@ void train_coco(char *cfgfile, char *weightfile)
     save_weights(net, buff);
 }
 
-void print_cocos(FILE *fp, int image_id, box *boxes, float **probs, int num_boxes, int classes, int w, int h)
+void print_cocos(FILE *fp, int image_id, darknet_box *boxes, float **probs, int num_boxes, int classes, int w, int h)
 {
     int i, j;
     for(i = 0; i < num_boxes; ++i){
@@ -154,7 +154,7 @@ void validate_coco(char *cfgfile, char *weightfile)
     FILE *fp = fopen(buff, "w");
     fprintf(fp, "[\n");
 
-    box *boxes = calloc(side*side*l.n, sizeof(box));
+    darknet_box *boxes = calloc(side*side*l.n, sizeof(darknet_box));
     float **probs = calloc(side*side*l.n, sizeof(float *));
     for(j = 0; j < side*side*l.n; ++j) probs[j] = calloc(classes, sizeof(float *));
 
@@ -244,7 +244,7 @@ void validate_coco_recall(char *cfgfile, char *weightfile)
         snprintf(buff, 1024, "%s%s.txt", base, coco_classes[j]);
         fps[j] = fopen(buff, "w");
     }
-    box *boxes = calloc(side*side*l.n, sizeof(box));
+    darknet_box *boxes = calloc(side*side*l.n, sizeof(darknet_box));
     float **probs = calloc(side*side*l.n, sizeof(float *));
     for(j = 0; j < side*side*l.n; ++j) probs[j] = calloc(classes, sizeof(float *));
 
@@ -285,7 +285,7 @@ void validate_coco_recall(char *cfgfile, char *weightfile)
         }
         for (j = 0; j < num_labels; ++j) {
             ++total;
-            box t = {truth[j].x, truth[j].y, truth[j].w, truth[j].h};
+            darknet_box t = {truth[j].x, truth[j].y, truth[j].w, truth[j].h};
             float best_iou = 0;
             for(k = 0; k < side*side*l.n; ++k){
                 float iou = box_iou(boxes[k], t);
@@ -321,7 +321,7 @@ void test_coco(char *cfgfile, char *weightfile, char *filename, float thresh)
     char buff[256];
     char *input = buff;
     int j;
-    box *boxes = calloc(l.side*l.side*l.n, sizeof(box));
+    darknet_box *boxes = calloc(l.side*l.side*l.n, sizeof(darknet_box));
     float **probs = calloc(l.side*l.side*l.n, sizeof(float *));
     for(j = 0; j < l.side*l.side*l.n; ++j) probs[j] = calloc(l.classes, sizeof(float *));
     while(1){
