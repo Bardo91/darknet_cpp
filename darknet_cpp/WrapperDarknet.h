@@ -26,7 +26,7 @@ public:
 private:
     list *mOptions;
     network mNet;
-    box *mBoxes;
+    darknet_box *mBoxes;
     float **mProbs;
     float **mMasks;
 };

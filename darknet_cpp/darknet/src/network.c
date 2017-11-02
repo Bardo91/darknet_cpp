@@ -500,10 +500,10 @@ int num_boxes(network *net)
     return l.w*l.h*l.n;
 }
 
-box *make_boxes(network *net)
+darknet_box *make_boxes(network *net)
 {
     layer l = net->layers[net->n-1];
-    box *boxes = calloc(l.w*l.h*l.n, sizeof(box));
+    darknet_box *boxes = calloc(l.w*l.h*l.n, sizeof(darknet_box));
     return boxes;
 }
 
@@ -516,7 +516,7 @@ float **make_probs(network *net)
     return probs;
 }
 
-void network_detect(network *net, image im, float thresh, float hier_thresh, float nms, box *boxes, float **probs)
+void network_detect(network *net, image im, float thresh, float hier_thresh, float nms, darknet_box *boxes, float **probs)
 {
     network_predict_image(net, im);
     layer l = net->layers[net->n-1];

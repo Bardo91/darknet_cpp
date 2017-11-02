@@ -6,9 +6,9 @@ typedef struct{
     float dx, dy, dw, dh;
 } dbox;
 
-float box_rmse(box a, box b);
-dbox diou(box a, box b);
-box decode_box(box b, box anchor);
-box encode_box(box b, box anchor);
+float box_rmse(darknet_box a, darknet_box b);
+dbox diou(darknet_box a, darknet_box b);
+darknet_box decode_box(darknet_box b, darknet_box anchor);
+darknet_box encode_box(darknet_box b, darknet_box anchor);
 
 #endif

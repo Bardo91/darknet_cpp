@@ -158,7 +158,7 @@ static int get_coco_image_id(char *filename)
     return atoi(p+1);
 }
 
-static void print_cocos(FILE *fp, char *image_path, box *boxes, float **probs, int num_boxes, int classes, int w, int h)
+static void print_cocos(FILE *fp, char *image_path, darknet_box *boxes, float **probs, int num_boxes, int classes, int w, int h)
 {
     int i, j;
     int image_id = get_coco_image_id(image_path);
@@ -184,7 +184,7 @@ static void print_cocos(FILE *fp, char *image_path, box *boxes, float **probs, i
     }
 }
 
-void print_detector_detections(FILE **fps, char *id, box *boxes, float **probs, int total, int classes, int w, int h)
+void print_detector_detections(FILE **fps, char *id, darknet_box *boxes, float **probs, int total, int classes, int w, int h)
 {
     int i, j;
     for(i = 0; i < total; ++i){
@@ -205,7 +205,7 @@ void print_detector_detections(FILE **fps, char *id, box *boxes, float **probs, 
     }
 }
 
-void print_imagenet_detections(FILE *fp, int id, box *boxes, float **probs, int total, int classes, int w, int h)
+void print_imagenet_detections(FILE *fp, int id, darknet_box *boxes, float **probs, int total, int classes, int w, int h)
 {
     int i, j;
     for(i = 0; i < total; ++i){
@@ -281,7 +281,7 @@ void validate_detector_flip(char *datacfg, char *cfgfile, char *weightfile, char
     }
 
 
-    box *boxes = calloc(l.w*l.h*l.n, sizeof(box));
+    darknet_box *boxes = calloc(l.w*l.h*l.n, sizeof(darknet_box));
     float **probs = calloc(l.w*l.h*l.n, sizeof(float *));
     for(j = 0; j < l.w*l.h*l.n; ++j) probs[j] = calloc(classes+1, sizeof(float *));
 
@@ -417,7 +417,7 @@ void validate_detector(char *datacfg, char *cfgfile, char *weightfile, char *out
     }
 
 
-    box *boxes = calloc(l.w*l.h*l.n, sizeof(box));
+    darknet_box *boxes = calloc(l.w*l.h*l.n, sizeof(darknet_box));
     float **probs = calloc(l.w*l.h*l.n, sizeof(float *));
     for(j = 0; j < l.w*l.h*l.n; ++j) probs[j] = calloc(classes+1, sizeof(float *));
 
@@ -510,7 +510,7 @@ void validate_detector_recall(char *cfgfile, char *weightfile)
     int classes = l.classes;
 
     int j, k;
-    box *boxes = calloc(l.w*l.h*l.n, sizeof(box));
+    darknet_box *boxes = calloc(l.w*l.h*l.n, sizeof(darknet_box));
     float **probs = calloc(l.w*l.h*l.n, sizeof(float *));
     for(j = 0; j < l.w*l.h*l.n; ++j) probs[j] = calloc(classes+1, sizeof(float *));
 
@@ -550,7 +550,7 @@ void validate_detector_recall(char *cfgfile, char *weightfile)
         }
         for (j = 0; j < num_labels; ++j) {
             ++total;
-            box t = {truth[j].x, truth[j].y, truth[j].w, truth[j].h};
+            darknet_box t = {truth[j].x, truth[j].y, truth[j].w, truth[j].h};
             float best_iou = 0;
             for(k = 0; k < l.w*l.h*l.n; ++k){
                 float iou = box_iou(boxes[k], t);
@@ -607,7 +607,7 @@ void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filenam
         //resize_network(&net, sized.w, sized.h);
         layer l = net.layers[net.n-1];
 
-        box *boxes = calloc(l.w*l.h*l.n, sizeof(box));
+        darknet_box *boxes = calloc(l.w*l.h*l.n, sizeof(darknet_box));
         float **probs = calloc(l.w*l.h*l.n, sizeof(float *));
         for(j = 0; j < l.w*l.h*l.n; ++j) probs[j] = calloc(l.classes + 1, sizeof(float *));
         float **masks = 0;

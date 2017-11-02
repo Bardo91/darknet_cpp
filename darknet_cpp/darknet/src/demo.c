@@ -18,11 +18,11 @@ static image **demo_alphabet;
 static int demo_classes;
 
 static float **probs;
-static box *boxes;
+static darknet_box *boxes;
 static network net;
 static network net2;
 static float **probs2;
-static box *boxes2;
+static darknet_box *boxes2;
 static float **predictions2;
 static image buff [3];
 static image buff_letter[3];
@@ -175,7 +175,7 @@ void demo(char *cfgfile, char *weightfile, float thresh, int cam_index, const ch
     avg = (float *) calloc(l.outputs, sizeof(float));
     for(j = 0; j < demo_frame; ++j) predictions[j] = (float *) calloc(l.outputs, sizeof(float));
 
-    boxes = (box *)calloc(l.w*l.h*l.n, sizeof(box));
+    boxes = (darknet_box *)calloc(l.w*l.h*l.n, sizeof(darknet_box));
     probs = (float **)calloc(l.w*l.h*l.n, sizeof(float *));
     for(j = 0; j < l.w*l.h*l.n; ++j) probs[j] = (float *)calloc(l.classes+1, sizeof(float));
 
@@ -263,7 +263,7 @@ void demo_compare(char *cfg1, char *weight1, char *cfg2, char *weight2, float th
     avg = (float *) calloc(l.outputs, sizeof(float));
     for(j = 0; j < demo_frame; ++j) predictions[j] = (float *) calloc(l.outputs, sizeof(float));
 
-    boxes = (box *)calloc(l.w*l.h*l.n, sizeof(box));
+    boxes = (darknet_box *)calloc(l.w*l.h*l.n, sizeof(darknet_box));
     probs = (float **)calloc(l.w*l.h*l.n, sizeof(float *));
     for(j = 0; j < l.w*l.h*l.n; ++j) probs[j] = (float *)calloc(l.classes+1, sizeof(float));
 

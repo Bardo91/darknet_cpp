@@ -102,13 +102,13 @@ void forward_detection_layer(const detection_layer l, network net)
                     avg_allcat += l.output[class_index+j];
                 }
 
-                box truth = float_to_box(net.truth + truth_index + 1 + l.classes, 1);
+                darknet_box truth = float_to_box(net.truth + truth_index + 1 + l.classes, 1);
                 truth.x /= l.side;
                 truth.y /= l.side;
 
                 for(j = 0; j < l.n; ++j){
                     int box_index = index + locations*(l.classes + l.n) + (i*l.n + j) * l.coords;
-                    box out = float_to_box(l.output + box_index, 1);
+                    darknet_box out = float_to_box(l.output + box_index, 1);
                     out.x /= l.side;
                     out.y /= l.side;
 
@@ -147,7 +147,7 @@ void forward_detection_layer(const detection_layer l, network net)
                 int box_index = index + locations*(l.classes + l.n) + (i*l.n + best_index) * l.coords;
                 int tbox_index = truth_index + 1 + l.classes;
 
-                box out = float_to_box(l.output + box_index, 1);
+                darknet_box out = float_to_box(l.output + box_index, 1);
                 out.x /= l.side;
                 out.y /= l.side;
                 if (l.sqrt) {
@@ -222,7 +222,7 @@ void backward_detection_layer(const detection_layer l, network net)
     axpy_cpu(l.batch*l.inputs, 1, l.delta, 1, net.delta, 1);
 }
 
-void get_detection_boxes(layer l, int w, int h, float thresh, float **probs, box *boxes, int only_objectness)
+void get_detection_boxes(layer l, int w, int h, float thresh, float **probs, darknet_box *boxes, int only_objectness)
 {
     int i,j,n;
     float *predictions = l.output;
